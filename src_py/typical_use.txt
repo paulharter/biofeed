@@ -1,0 +1,49 @@
+"""
+Biofeed - An Open Source Python Physiological Monitoring project
+Author: Paul Harter
+Contact: paul@cleverplugs.com
+Copyright: Clever Plugs Ltd 2009
+Licence: Python License - http://www.python.org/psf/license/
+"""
+
+
+import biofeed
+
+COM_PORT = 40
+NORMALIZER = 1.0/1024
+
+bio = biofeed.Biofeed()
+        
+bio.addDsu(COM_PORT, 8)
+   
+heart = bio.addChannel("heart", COM_PORT, 0, ["ecg"], 320, 4)
+gsr = bio.addChannel("excite", COM_PORT, 1, ["gsr"], 320, 4)
+frown = bio.addChannel("frown", COM_PORT, 2, ["emg"], 320, 4)
+smile = bio.addChannel("smile", COM_PORT, 3, ["emg"], 320, 4)
+
+
+#optional calibrations to normalise range of results
+
+gsr.calibrate(0.0, 1.0)
+smile.calibrate(0.0, 1.0)
+frown.calibrate(0.0, 1.0)
+heart.calibrate(0.0, 1.0)
+
+
+bio.start()
+
+# then get data with calls like these
+
+# A list of 320 values each the average of 4 samples
+smileHistory = smile.history 
+
+# The average value since last time you asked
+gsrValue = gsr.value 
+
+# The last sample recieved
+lastFrown = frown.lastValue
+
+#best to formally  stop it when you are done
+
+bio.stop()
+

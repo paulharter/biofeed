@@ -1,0 +1,106 @@
+"""
+Biofeed - An Open Source Python Physiological Monitoring project
+Author: Paul Harter
+Contact: paul@cleverplugs.com
+Copyright: Clever Plugs Ltd 2009
+Licence: Python License - http://www.python.org/psf/license/
+"""
+
+--- Biofeed documentation ---
+
+
+class Biofeed
+
+creation
+
+- Biofeed()
+
+Makes a biofeed object typically you will only need one of these
+eg feed = biofeed.Biofeed()
+
+methods
+
+- addDsu(port, channels, serial=None, saveToFile=None)
+    Adds a DSU to the feed
+    port - is the com port number (zero indexed so com 40 is 39 might change this?)
+    channels - is the number in channels on the dsu
+    serial - ought not to be here really as only for testing ignore it
+    saveToFile - Address of a file to save data to
+
+- addChannel(name, port, ch, filters, size, combine)
+    Adds a channel and returns a instance of biofeed.biofeedCollector.Channel
+    name - is just a friendly name for your convienence.
+    port - is the com port number as above
+    ch - is an integer index of the channel on this port
+    filters - is a list of filter names 
+    size - is the number of samples that you want remembered in the history
+    combine - if you want to sample at a lower rate how many samples you want combined
+    
+- start()
+    Starts the feed.
+
+- stop()
+    Stops the feed.
+
+class Channel
+
+Channel are made for you by calling addChannel on an instance of Biofeed
+
+methods 
+
+- calibrate(offset, multiplier)
+    By default the values recieved will be floats in the range 0-1024 (as used in P3)
+    Use this method the scale the results to (value + offset) * multiplier
+    
+properties
+
+- value
+    gives you the average value since last time you asked or repeats the same value if no new input
+    
+- lastValue
+    gives you the single last sample recieved
+    
+- history
+    gives you a list of values and a fraction
+    If you gave a value other than 1 for combine in addChannel the values in the list will be averages 
+    of this number of samples and fraction will tell you how far through the latest set of combined samples you are
+
+        
+Example:
+
+from biofeed.biofeed import Biofeed
+
+COM_PORT = 39
+
+feed = Biofeed()
+
+feed.addDsu(COM_PORT, 8)
+   
+heart = bio.addChannel("heart", COM_PORT, 0, ["ecg"], 320, 4)
+gsr = bio.addChannel("excite", COM_PORT, 1, ["gsr"], 320, 4)
+frown = bio.addChannel("frown", COM_PORT, 2, ["emg"], 320, 4)
+smile = bio.addChannel("smile", COM_PORT, 3, ["emg"], 320, 4)
+
+#optional calibrations to normalise range of results
+gsr.calibrate(0.0, 1.0)
+smile.calibrate(0.0, 1.0)
+frown.calibrate(0.0, 1.0)
+heart.calibrate(0.0, 1.0)
+
+feed.start()
+
+# Then get data with calls like these
+
+# A list of 320 values each the average of 4 samples
+smileHistory, i = smile.history 
+
+# The average value since last time you asked
+gsrValue = gsr.value 
+
+# The last sample recieved
+lastFrown = frown.lastValue
+
+#best to formally  stop it when you are done
+
+feed.stop()
+

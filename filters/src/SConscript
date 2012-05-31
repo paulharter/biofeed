@@ -1,0 +1,17 @@
+import os
+Import('*')
+
+name = "filters"
+
+sources = ['filterFactory.cpp', 'filters.cpp']
+headers = ['filterFactory.h']
+
+print "path", env.platformConstants.LIBPATH
+
+env.SharedLibrary(target = os.path.join(env.platformConstants.BUILD_PATH, name), 
+    CPPPATH=env.platformConstants.CPPPATH,
+    LIBPATH=env.platformConstants.LIBPATH,
+    source=sources)
+
+
+
