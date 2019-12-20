@@ -215,12 +215,7 @@ class BioLinearFilter(BioFilter):
     def evaluate(self, value):
         input = ctypes.c_double(value)
         output = ctypes.c_double()
-        #print "input", self.name, value
         result = self.process(self.id, input, ctypes.byref(output))
-#        print "result", result
-#        print self.id
-#        print output
-#        print output.value
         self.output = output.value
         for name, child in self.children.iteritems():
             child.evaluate(self.output)

@@ -121,7 +121,7 @@ class BigDummySerialDataSource(DummySerialDataSource):
     
 class SineWaveDummySerialDataSource(DummySerialDataSource):
     
-    def __init__(self, comport, channels):
+    def __init__(self, comport=None, channels=None):
         self.index = 0
         super(SineWaveDummySerialDataSource, self).__init__(comport, channels)
         
